@@ -18,5 +18,9 @@ Este repositorio contiene una colección de mis notas y planes de estudio person
 
 *   Planes de estudio y metodologías de aprendizaje generadas con la ayuda de diferentes IAs.
 
+### 🚀 Prompts para Aprendizaje (`prompts/`)
+
+*   Una colección de prompts avanzados para usar con Gemini, diseñados para combinar la **Técnica Feynman** (comprensión profunda a través de la simplicidad) y el **Método Campayo** (memorización acelerada). Cubren todos los temas del repositorio.
+
 ---
 *Este README ha sido actualizado para reflejar el contenido del repositorio.*
