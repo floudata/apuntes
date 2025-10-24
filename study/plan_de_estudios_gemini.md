@@ -9,6 +9,48 @@ Este plan está diseñado para un profesional con una **base en Física y experi
 
 El plan integra una profunda formación en **Inteligencia Artificial**, desarrollo de software full-stack, MLOps y ciberseguridad, reconociendo que tanto la infraestructura actual como la cuántica del futuro dependerán de sistemas de control y gestión autónomos y seguros.
 
+## Diagrama de Secuencia de la Trayectoria
+
+```mermaid
+sequenceDiagram
+    participant EP as Estudiante_Profesional
+    participant IA as Industria_AIOps_MLOps
+    participant MA as Maestria_en_IA
+    participant DC as Doctorado_Cuantico
+    participant CC as Comunidad_Cientifica
+
+    title Trayectoria Profesional: De AIOps a Redes Cuánticas
+
+    rect rgb(200, 220, 240)
+        note over EP,IA: Modulo 1: Fundacion (12-18 meses)
+        EP->>EP: Estudia Modulos Transversales y del Modulo 1
+        EP->>IA: Construye y publica proyectos de AIOps (Portfolio)
+        note right of EP: Se consolida como "AI Engineer" con foco en AIOps.
+    end
+
+    rect rgb(220, 240, 200)
+        note over EP,MA: Modulo 2: Especializacion (Durante Maestria)
+        EP->>MA: Ingresa a la Maestria en IA
+        MA-->>EP: Provee formacion avanzada
+        EP->>EP: Estudia Areas del Modulo 2 (MLOps, DRL, QML)
+        EP->>IA: Desarrolla proyectos MLOps/DRL a escala
+        note left of MA: Se consolida como "Arquitecto de Sistemas de IA".
+    end
+
+    rect rgb(240, 220, 200)
+        note over EP,DC: Modulo 3: Investigacion (Post-Maestria / PhD)
+        EP->>DC: Ingresa al Doctorado
+        DC-->>EP: Provee marco de investigacion
+        EP->>EP: Estudia Areas del Modulo 3 (Internet Cuantica, PQC)
+        EP->>CC: Publica investigacion (Papers, Open Source)
+        note right of EP: Se posiciona como "Investigador en Infraestructura Inteligente".
+    end
+
+    DC->>CC: Contribuye con Tesis Doctoral
+    IA->>EP: Ofrece roles de liderazgo
+    CC->>EP: Reconocimiento academico
+```
+
 ***
 
 ## Evaluación Estratégica y Puntos de Mejora
