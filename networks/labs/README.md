@@ -33,12 +33,15 @@ labs/
 **Objetivo:** Aprender los fundamentos de ContainerLab y SR Linux
 
 #### Topología
-```
-┌─────┐         ┌─────┐
-│  R1 │────────│  R2 │
-└─────┘         └─────┘
- .1              .2
-    10.0.0.0/30
+```mermaid
+graph LR
+    R1["R1<br/>e1-1: 10.0.0.1/30<br/>Mgmt: 172.25.25.11"]
+    R2["R2<br/>e1-1: 10.0.0.2/30<br/>Mgmt: 172.25.25.12"]
+
+    R1 ---|"e1-1 ↔ e1-1<br/>10.0.0.0/30"| R2
+
+    style R1 fill:#e1f5ff,stroke:#333,stroke-width:2px
+    style R2 fill:#e1f5ff,stroke:#333,stroke-width:2px
 ```
 
 #### Características
@@ -82,15 +85,18 @@ sudo containerlab destroy -t lab1-basic.yml
 **Objetivo:** Configuración automatizada con archivos JSON y rutas estáticas
 
 #### Topología
-```
-┌─────┐         ┌─────┐         ┌─────┐
-│  R1 │────────│  R2 │────────│  R3 │
-└─────┘         └─────┘         └─────┘
- Lo0:            Lo0:            Lo0:
- 1.1.1.1         2.2.2.2         3.3.3.3
+```mermaid
+graph LR
+    R1["R1<br/>Lo0: 1.1.1.1/32<br/>e1-1: 10.0.0.1/30"]
+    R2["R2<br/>Lo0: 2.2.2.2/32<br/>e1-1: 10.0.0.2/30<br/>e1-2: 10.0.0.5/30"]
+    R3["R3<br/>Lo0: 3.3.3.3/32<br/>e1-1: 10.0.0.6/30"]
 
- .1─────.2       .5─────.6
-  10.0.0.0/30     10.0.0.4/30
+    R1 ---|"e1-1 ↔ e1-1<br/>10.0.0.0/30"| R2
+    R2 ---|"e1-2 ↔ e1-1<br/>10.0.0.4/30"| R3
+
+    style R1 fill:#e1f5ff,stroke:#333,stroke-width:2px
+    style R2 fill:#ffe1f5,stroke:#333,stroke-width:2px
+    style R3 fill:#e1f5ff,stroke:#333,stroke-width:2px
 ```
 
 #### Características
@@ -153,6 +159,106 @@ sudo containerlab destroy -t basic_r1-r2-r3.yml
 | **Tiempo** | 30-45 min | 1-2 horas |
 | **Nivel** | Principiante | Intermedio |
 
+### Progresión Visual de Labs
+
+```mermaid
+graph LR
+    subgraph "Lab 1: basic/"
+        B1[R1] --- B2[R2]
+    end
+
+    subgraph "Lab 2: r1-r2-r3/"
+        R1[R1<br/>+ Loopback] --- R2[R2<br/>+ Loopback]
+        R2 --- R3[R3<br/>+ Loopback]
+    end
+
+    subgraph "Lab 3: OSPF (próximo)"
+        O1[R1<br/>Area 0] --- O2[R2<br/>ABR]
+        O2 --- O3[R3<br/>Area 1]
+        O2 --- O4[R4<br/>Area 1]
+    end
+
+    subgraph "Lab 4: MPLS (futuro)"
+        M1[CPE-A] --- M2[PE1<br/>VRF-A]
+        M2 --- M3[P<br/>Core]
+        M3 --- M4[PE2<br/>VRF-A]
+        M4 --- M5[CPE-A]
+    end
+
+    basic --> r1-r2-r3
+    r1-r2-r3 --> OSPF
+    OSPF --> MPLS
+
+    style B1 fill:#e1f5ff
+    style B2 fill:#e1f5ff
+    style R1 fill:#c8e6c9
+    style R2 fill:#c8e6c9
+    style R3 fill:#c8e6c9
+    style O1 fill:#fff9c4
+    style O2 fill:#fff9c4
+    style O3 fill:#fff9c4
+    style O4 fill:#fff9c4
+    style M1 fill:#ffccbc
+    style M2 fill:#ffccbc
+    style M3 fill:#ffccbc
+    style M4 fill:#ffccbc
+    style M5 fill:#ffccbc
+```
+
+---
+
+## Arquitectura de ContainerLab
+
+```mermaid
+graph TB
+    subgraph "Host System"
+        subgraph "Docker Engine"
+            subgraph "Management Network<br/>172.25.25.0/24"
+                MGMT[Docker Bridge<br/>clab]
+            end
+
+            subgraph "Lab Containers"
+                R1[R1 Container<br/>Nokia SR Linux]
+                R2[R2 Container<br/>Nokia SR Linux]
+                R3[R3 Container<br/>Nokia SR Linux]
+            end
+        end
+
+        CL[ContainerLab CLI<br/>containerlab]
+        YML[Topology File<br/>*.yml]
+        CFG[Startup Configs<br/>*.cfg]
+    end
+
+    HOST[Your PC/Terminal]
+
+    HOST --> CL
+    CL --> YML
+    CL --> Docker
+    YML -.defines.-> R1
+    YML -.defines.-> R2
+    YML -.defines.-> R3
+    CFG -.applied to.-> R1
+    CFG -.applied to.-> R2
+    CFG -.applied to.-> R3
+
+    MGMT --- R1
+    MGMT --- R2
+    MGMT --- R3
+
+    R1 <-->|Data Plane| R2
+    R2 <-->|Data Plane| R3
+
+    HOST -.SSH.-> MGMT
+
+    style R1 fill:#4a90e2,color:#fff
+    style R2 fill:#4a90e2,color:#fff
+    style R3 fill:#4a90e2,color:#fff
+    style MGMT fill:#f5a623,color:#000
+    style CL fill:#7ed321,color:#000
+    style YML fill:#f5f5f5
+    style CFG fill:#f5f5f5
+```
+
 ---
 
 ## Guía de Inicio Rápido
@@ -191,6 +297,44 @@ docker pull ghcr.io/nokia/srlinux:latest
 ---
 
 ### Flujo de Trabajo Típico
+
+```mermaid
+sequenceDiagram
+    participant User as Usuario
+    participant CL as ContainerLab
+    participant Docker as Docker Engine
+    participant R1 as Router R1
+    participant R2 as Router R2
+
+    User->>CL: containerlab deploy -t lab.yml
+    CL->>Docker: Crear network clab
+    Docker-->>CL: Network creada
+    CL->>Docker: Crear container R1
+    Docker->>R1: Iniciar SR Linux
+    R1->>R1: Aplicar startup-config
+    CL->>Docker: Crear container R2
+    Docker->>R2: Iniciar SR Linux
+    R2->>R2: Aplicar startup-config
+    CL->>Docker: Crear veth links
+    Docker-->>CL: Links creados
+    CL-->>User: Lab desplegado ✅
+
+    User->>R1: SSH admin@R1
+    R1-->>User: CLI prompt
+    User->>R1: Configurar interfaces
+    User->>R1: commit now
+    R1-->>User: Config aplicada
+
+    User->>R1: ping R2
+    R1->>R2: ICMP Request
+    R2->>R1: ICMP Reply
+    R1-->>User: Ping exitoso ✅
+
+    User->>CL: containerlab destroy -t lab.yml
+    CL->>Docker: Detener containers
+    CL->>Docker: Eliminar containers
+    CL-->>User: Lab destruido ✅
+```
 
 #### 1. Desplegar laboratorio
 ```bash
@@ -311,17 +455,55 @@ Activa el stack IPv4 (Layer 3, ARP, routing).
 
 En SR Linux, una **network-instance** es equivalente a un **VRF**.
 
+```mermaid
+graph TB
+    subgraph Router["Nokia SR Linux Router"]
+        subgraph NI_MGMT["Network Instance: mgmt"]
+            MGMT_IF[mgmt0<br/>172.25.25.11/24]
+            MGMT_RT[Routing Table]
+            MGMT_ARP[ARP Table]
+        end
+
+        subgraph NI_DEFAULT["Network Instance: default"]
+            DATA_IF1[ethernet-1/1.0<br/>10.0.0.1/30]
+            DATA_IF2[ethernet-1/2.0<br/>10.0.0.5/30]
+            DATA_RT[Routing Table]
+            DATA_ARP[ARP Table]
+            DATA_OSPF[OSPF Process]
+        end
+
+        subgraph NI_HOST["Network Instance: host"]
+            HOST_SYS[Sistema Linux Interno]
+        end
+    end
+
+    MGMT_IF -.-> MGMT_RT
+    MGMT_IF -.-> MGMT_ARP
+    DATA_IF1 -.-> DATA_RT
+    DATA_IF2 -.-> DATA_RT
+    DATA_IF1 -.-> DATA_ARP
+    DATA_IF2 -.-> DATA_ARP
+    DATA_OSPF -.-> DATA_RT
+
+    style NI_MGMT fill:#fff4e6,stroke:#f39c12,stroke-width:3px
+    style NI_DEFAULT fill:#e1f5ff,stroke:#3498db,stroke-width:3px
+    style NI_HOST fill:#f0f0f0,stroke:#95a5a6,stroke-width:2px
+    style MGMT_IF fill:#ffe6e6
+    style DATA_IF1 fill:#e6ffe6
+    style DATA_IF2 fill:#e6ffe6
+```
+
+**Asociar interfaz a network-instance:**
 ```bash
-# Asociar interfaz a network-instance
 set network-instance default interface ethernet-1/1.0
 ```
 
 **Network instances por defecto:**
-- `mgmt`: Management del router (SSH, APIs)
-- `default`: Tráfico de datos / producción
-- `host`: Comunicación interna del OS
+- `mgmt`: Management del router (SSH, APIs) - Aislada
+- `default`: Tráfico de datos / producción - Principal
+- `host`: Comunicación interna del OS - Sistema
 
-**Concepto clave:** Las interfaces DEBEN estar asociadas a una network-instance para poder enrutar tráfico.
+**Concepto clave:** Las interfaces DEBEN estar asociadas a una network-instance para poder enrutar tráfico. Cada network-instance tiene su propia tabla de routing, ARP y protocolos completamente aislados.
 
 ---
 
@@ -393,6 +575,47 @@ diff
 ---
 
 ## Troubleshooting Común
+
+```mermaid
+graph TD
+    START[Interfaz no funciona] --> CHECK1{Interface física<br/>admin-state enabled?}
+    CHECK1 -->|NO| FIX1[set interface eth-X/Y<br/>admin-state enable]
+    CHECK1 -->|SÍ| CHECK2{Subinterface<br/>admin-state enabled?}
+
+    CHECK2 -->|NO| FIX2[set interface eth-X/Y<br/>subinterface 0<br/>admin-state enable]
+    CHECK2 -->|SÍ| CHECK3{IPv4<br/>admin-state enabled?}
+
+    CHECK3 -->|NO| FIX3[set interface eth-X/Y<br/>subinterface 0 ipv4<br/>admin-state enable]
+    CHECK3 -->|SÍ| CHECK4{IP address<br/>configurada?}
+
+    CHECK4 -->|NO| FIX4[set interface eth-X/Y<br/>subinterface 0 ipv4<br/>address X.X.X.X/YY]
+    CHECK4 -->|SÍ| CHECK5{Interface asociada<br/>a network-instance?}
+
+    CHECK5 -->|NO| FIX5[set network-instance default<br/>interface eth-X/Y.0]
+    CHECK5 -->|SÍ| CHECK6{Peer configurado<br/>correctamente?}
+
+    CHECK6 -->|NO| FIX6[Verificar configuración<br/>del otro router]
+    CHECK6 -->|SÍ| SUCCESS[✅ Interfaz OK<br/>Verificar routing]
+
+    FIX1 --> COMMIT[commit now]
+    FIX2 --> COMMIT
+    FIX3 --> COMMIT
+    FIX4 --> COMMIT
+    FIX5 --> COMMIT
+    FIX6 --> COMMIT
+    COMMIT --> VERIFY[Verificar con:<br/>show interface<br/>ping network-instance default]
+
+    style START fill:#ffcccc,stroke:#cc0000,stroke-width:2px
+    style SUCCESS fill:#ccffcc,stroke:#00cc00,stroke-width:2px
+    style FIX1 fill:#fff4cc,stroke:#ffaa00,stroke-width:2px
+    style FIX2 fill:#fff4cc,stroke:#ffaa00,stroke-width:2px
+    style FIX3 fill:#fff4cc,stroke:#ffaa00,stroke-width:2px
+    style FIX4 fill:#fff4cc,stroke:#ffaa00,stroke-width:2px
+    style FIX5 fill:#fff4cc,stroke:#ffaa00,stroke-width:2px
+    style FIX6 fill:#fff4cc,stroke:#ffaa00,stroke-width:2px
+    style COMMIT fill:#cce5ff,stroke:#0066cc,stroke-width:2px
+    style VERIFY fill:#e6ccff,stroke:#6600cc,stroke-width:2px
+```
 
 ### Problema 1: "no-ip-config"
 **Síntoma:** Interfaz down con razón `no-ip-config`
