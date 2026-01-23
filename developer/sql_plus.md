@@ -1,9 +1,3 @@
-¡Claro que sí! Aquí tienes la **Guía de Estudio Completa y Actualizada (v2.0)**.
-
-He integrado la nueva sección de **"Automatización y Persistencia"** al final (Punto 6), explicando cómo configurar el `login.sql` y cómo guardar tus scripts para no tener que volver a escribir todo el código la próxima vez.
-
-Puedes copiar y pegar todo esto en un nuevo archivo (ej: `guia_oracle_avanzada.md`).
-
 ---
 
 # Guía de Estudio: Análisis de Datos y Reporting en Oracle SQL
