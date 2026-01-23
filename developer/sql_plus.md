@@ -1,5 +1,3 @@
----
-
 # Guía de Estudio: Análisis de Datos y Reporting en Oracle SQL
 
 **Caso de Estudio:** Análisis de Cumplimiento de SLA
